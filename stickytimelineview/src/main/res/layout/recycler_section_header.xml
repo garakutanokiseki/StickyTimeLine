@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="@dimen/recycler_section_header_height"
-    android:paddingLeft="@dimen/header_padding_left">
+    >
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/dot"
@@ -12,6 +12,7 @@
         android:layout_height="@dimen/dot_size"
         android:layout_marginRight="2dp"
         android:layout_marginLeft="2dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/v_item_background"
         app:layout_constraintStart_toStartOf="parent"
@@ -21,10 +22,9 @@
         android:id="@+id/v_item_background"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginLeft="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/dot"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -34,6 +34,7 @@
         android:fontFamily="sans-serif-light"
         android:gravity="center_vertical"
         android:textStyle="bold"
+        android:layout_marginLeft="8dp"
         app:layout_constraintBottom_toBottomOf="@+id/dot"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.07"
@@ -48,6 +49,7 @@
         android:layout_height="wrap_content"
         android:fontFamily="sans-serif-light"
         android:gravity="top"
+        android:layout_marginRight="8dp"
         app:layout_constraintEnd_toEndOf="@+id/list_item_section_title"
         app:layout_constraintHorizontal_bias="0.505"
         app:layout_constraintStart_toStartOf="@+id/list_item_section_title"

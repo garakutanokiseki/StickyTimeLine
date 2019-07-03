@@ -38,8 +38,9 @@ class RecyclerSectionItemDecoration(
     private var headerTitle: TextView? = null
     private var headerSubTitle: TextView? = null
     private var dot: AppCompatImageView? = null
-    private var defaultOffset: Int = 8.DP(context).toInt()
-    private var headerOffset = defaultOffset * 8
+    //private var defaultOffset: Int = 8.DP(context).toInt()
+    private var defaultOffset: Int = 0
+    private var headerOffset = 8.DP(context).toInt() * 8
 
 
     /**
@@ -93,7 +94,7 @@ class RecyclerSectionItemDecoration(
         )
         var previousHeader = SectionInfo("")
         if (headerView == null) getHeaderView(parent)
-        drawLine(c, parent)
+        //drawLine(c, parent)
 
         val childInContact = getChildInContact(parent, headerOffset * 2)
 
