@@ -6,6 +6,7 @@ import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
+import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -33,11 +34,13 @@ class RecyclerSectionItemDecoration(
     private val recyclerViewAttr: RecyclerViewAttr
 ) : RecyclerView.ItemDecoration() {
 
+    private val TAG = "SectionItemDeco"
     private var headerView: View? = null
     private var headerBackground: View? = null
     private var headerTitle: TextView? = null
     private var headerSubTitle: TextView? = null
     private var dot: AppCompatImageView? = null
+    private var currentSectionInfo:SectionInfo? = null
     //private var defaultOffset: Int = 8.DP(context).toInt()
     private var defaultOffset: Int = 0
     private var headerOffset = 8.DP(context).toInt() * 8
@@ -98,40 +101,58 @@ class RecyclerSectionItemDecoration(
 
         val childInContact = getChildInContact(parent, headerOffset * 2)
 
-        childInContact?.let {
-            val contractPosition = parent.getChildAdapterPosition(childInContact)
-            if (getIsSection(contractPosition) && recyclerViewAttr.isSticky) {
+        Log.v(TAG, "childInContact = " + childInContact?.toString())
+
+        //先頭のヘッダを書く
+        if(recyclerViewAttr.isSticky){
+            val childTopView = parent.getChildAt(0)
+            val contractPosition = parent.getChildAdapterPosition(childTopView)
+
+            //先頭行にヘッダがある場合
+            if (getIsSection(contractPosition)) {
                 val topChild = parent.getChildAt(0) ?: return
                 val topChildPosition = parent.getChildAdapterPosition(topChild)
                 headerView?.let {
                     sectionCallback.getSectionHeader(topChildPosition)?.let { sectionInfo ->
+
+                        currentSectionInfo = sectionInfo
+                        Log.v(TAG, "title(1)" + currentSectionInfo!!.title)
+
                         previousHeader = sectionInfo
                         setHeaderView(sectionInfo)
-                        val offset =
-                            if (topChildPosition == 0
-                                && childInContact.top - (headerOffset * 2) == (-1 * headerOffset)
-                            ) 0f
-                            else
-                                (childInContact.top - (headerOffset * 2)).toFloat()
-
-                        moveHeader(c, it, offset)
+                        moveHeader(c, it, 0f)
+                    }
+                }
+            }
+            else{
+                //前の行にヘッダがあるかを探す
+                headerView?.let {
+                    if(currentSectionInfo != null){
+                        Log.v(TAG, "title(2)" + currentSectionInfo!!.title)
+                        currentSectionInfo!!
+                        setHeaderView(currentSectionInfo!!)
+                        moveHeader(c, it, 0f)
                     }
                 }
             }
         }
 
+        //各行のヘッダを書く
         for (i in 0 until parent.childCount) {
             val child = parent.getChildAt(i)
             val position = parent.getChildAdapterPosition(child)
             sectionCallback.getSectionHeader(position)?.let { sectionInfo ->
                 setHeaderView(sectionInfo)
-                if (previousHeader.title != sectionInfo.title) {
+
+                Log.v(TAG, "title i = " + i + ", title = " + sectionInfo!!.title)
+
+                //if (previousHeader.title != sectionInfo.title) {
                     headerView?.let {
                         drawHeader(c, child, it)
                         previousHeader = sectionInfo
                     }
 
-                }
+                //}
             }
         }
     }
