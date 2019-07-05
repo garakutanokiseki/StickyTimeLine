@@ -6,7 +6,6 @@ import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
-import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -95,44 +94,30 @@ class RecyclerSectionItemDecoration(
             parent,
             state
         )
-        var previousHeader = SectionInfo("")
+
         if (headerView == null) getHeaderView(parent)
-        //drawLine(c, parent)
-
-        val childInContact = getChildInContact(parent, headerOffset * 2)
-
-        Log.v(TAG, "childInContact = " + childInContact?.toString())
 
         //先頭のヘッダを書く
         if(recyclerViewAttr.isSticky){
-            val childTopView = parent.getChildAt(0)
-            val contractPosition = parent.getChildAdapterPosition(childTopView)
 
             //先頭行にヘッダがある場合
-            if (getIsSection(contractPosition)) {
-                val topChild = parent.getChildAt(0) ?: return
-                val topChildPosition = parent.getChildAdapterPosition(topChild)
-                headerView?.let {
-                    sectionCallback.getSectionHeader(topChildPosition)?.let { sectionInfo ->
+            val topChild = parent.getChildAt(0)
+            val topChildPosition = parent.getChildAdapterPosition(topChild)
+            headerView?.let {
+                sectionCallback.getSectionHeader(topChildPosition)?.let { sectionInfo ->
 
-                        currentSectionInfo = sectionInfo
-                        Log.v(TAG, "title(1)" + currentSectionInfo!!.title)
+                    //1行のViewの位置を得る
+                    val childInContact = getChildInContact(parent, headerOffset * 2)
 
-                        previousHeader = sectionInfo
-                        setHeaderView(sectionInfo)
-                        moveHeader(c, it, 0f)
+                    //ヘッダをずらす縦方向のオフセットを計算する
+                    var offset = 0f
+                    if(sectionCallback.isSection(topChildPosition + 1) && childInContact != null){
+                        offset = (childInContact!!.top - (headerOffset * 2)).toFloat()
+
                     }
-                }
-            }
-            else{
-                //前の行にヘッダがあるかを探す
-                headerView?.let {
-                    if(currentSectionInfo != null){
-                        Log.v(TAG, "title(2)" + currentSectionInfo!!.title)
-                        currentSectionInfo!!
-                        setHeaderView(currentSectionInfo!!)
-                        moveHeader(c, it, 0f)
-                    }
+                    currentSectionInfo = sectionInfo
+                    setHeaderView(sectionInfo)
+                    moveHeader(c, it, offset)
                 }
             }
         }
@@ -141,18 +126,14 @@ class RecyclerSectionItemDecoration(
         for (i in 0 until parent.childCount) {
             val child = parent.getChildAt(i)
             val position = parent.getChildAdapterPosition(child)
+
+            if(!sectionCallback.isSection(position))continue
+
             sectionCallback.getSectionHeader(position)?.let { sectionInfo ->
                 setHeaderView(sectionInfo)
-
-                Log.v(TAG, "title i = " + i + ", title = " + sectionInfo!!.title)
-
-                //if (previousHeader.title != sectionInfo.title) {
-                    headerView?.let {
-                        drawHeader(c, child, it)
-                        previousHeader = sectionInfo
-                    }
-
-                //}
+                headerView?.let {
+                    drawHeader(c, child, it)
+                }
             }
         }
     }
@@ -192,7 +173,7 @@ class RecyclerSectionItemDecoration(
     private fun setHeaderView(sectionInfo: SectionInfo) {
         headerTitle?.text = sectionInfo.title
         setHeaderSubTitle(sectionInfo.subTitle)
-        setDotDrawable(sectionInfo.dotDrawable)
+        //setDotDrawable(sectionInfo.dotDrawable)
     }
 
     private fun setHeaderSubTitle(sectionSubTitle: String?) {
